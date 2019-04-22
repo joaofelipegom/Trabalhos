@@ -6,7 +6,7 @@
 #include <sys/wait.h>
 #include <pthread.h>
 
-int processadores;
+int processadores = 0;
 
 int maior_global = -1;
 
@@ -14,7 +14,6 @@ struct dados_thread {
     int *vet;
     int tamanho_vetor;
     int numero_da_thread;
-
 };
 
 void *funcao_da_thread(void *argumento_funcao) {
@@ -22,24 +21,28 @@ void *funcao_da_thread(void *argumento_funcao) {
     struct dados_thread *dados = (struct dados_thread *)argumento_funcao;
 
     int i = 0;
-    int inicio_vetor = (dados->tamanho_vetor/processadores)*dados->numero_da_thread;
-    int final_vetor = (dados->tamanho_vetor/processadores)*(dados->numero_da_thread + 1);
+    int inicio_vetor = (dados->tamanho_vetor/4)*dados->numero_da_thread;
+    int final_vetor = (dados->tamanho_vetor/4)*(dados->numero_da_thread + 1);
 
+    /* Variable local do maior numero do vetor */
     int maior = -1;
 
-    printf("TESTE %d\n", dados->vet[4]);
-    //printf("Sou a Thread %d -- Vetor inicia em %d e termina em %d\n", dados->numero_da_thread, inicio_vetor, final_vetor);
+    printf("Sou a Thread %d -- Vetor inicia em %d e termina em %d\n", dados->numero_da_thread, inicio_vetor, final_vetor);
 
     for (i = inicio_vetor; i < final_vetor; i++) {
-        if (maior < dados->vet[i]) {
+        if (maior <dados->vet[i]) {
             maior = dados->vet[i];
         }
     }
 
+    printf("Sou a Thread %d -- Achei maior igual à %d\n", dados->numero_da_thread, maior);
+
+    printf(" ----> Sou a Thread %d -- Vou atribuir meu valor maior.\n", dados->numero_da_thread);
     if (maior_global < maior) {
         usleep(rand() % 500);
         maior_global = maior;
     }
+    printf(" ----> Sou a Thread %d -- Ja atribui meu valor maior.\n", dados->numero_da_thread);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -101,7 +104,7 @@ int main(void){
                   dados[i].vet = vetor;
                   dados[i].tamanho_vetor = tamanhoVetor;
                   dados[i].numero_da_thread = i;
-                  pthread_create( & vetor_threads[i], NULL, funcao_da_thread, &dados[i]);
+                  pthread_create(&vetor_threads[i], NULL, funcao_da_thread, &dados[i]);
               }
 
               /* Conclui as Threads */
