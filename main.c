@@ -44,24 +44,32 @@ void* funcao_da_thread(void* argumento_funcao)
 
 int main(void)
 {
-    int i = 0, num = 0, a = 0, j = 0, valor, prc_n, sts = 0, val;
-    int vrf;
+    int i = 0, num = 0, a = 0, j = 0, valor, prc_n, sts = 0, val, aux_int, aux_prc;
+    float aux;
 
     printf("CRIANDO UM VETOR\n----------------\n");
     printf("INSIRA O TAMANHO DO VETOR: ");
     scanf("%i", &num);
     int v[num];
     pthread_t vetor_threads[num];
-    system("clear");
+    //system("clear");
 
     for (a = 0; a < num; a++) {
         printf("VALOR %d : ", a + 1);
-        scanf("%i", &v[a]);
+        scanf("%f", &aux);
+				aux_int = aux;
+				while((aux_int!=aux)){
+					printf("VALOR INVALIDO! INSIRA NOVAMENTE!");
+					printf("VALOR %d : ", a + 1);
+	        scanf("%f", &aux);
+					aux_int = aux;
+				}
+				v[a] = aux_int;
     }
 
     system("clear");
 
-    processadores:
+	processadores:
     printf("QUANTIDADE DE PROCESSOS? ");
     scanf("%i", &prc);
 
@@ -93,10 +101,14 @@ int main(void)
                     for (i = 0; i < prc; i++) {
                         pthread_join(vetor_threads[i], NULL);
                     }
-                    printf("Maior valor do vetor: %d\n", maior_global);
+                    printf("MAIOR VALOR DO VETOR: %d\n", maior_global);
                 }
             }
         }
     }
+		else{
+			printf("VALORES NEGATIVOS NÃO SÃO PERMITIDOS!");
+			goto processadores;
+		}
     return 0;
 }
