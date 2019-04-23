@@ -7,7 +7,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-int maior_global = -1, prc;
+int maior_global = -1, prc, menor_global;
 
 sem_t trava;
 
@@ -17,29 +17,37 @@ struct dados_thread {
     int numero_da_thread;
 };
 
-void* funcao_da_thread(void* argumento_funcao)
-{
-    struct dados_thread* dados = (struct dados_thread*)argumento_funcao;
+void* funcao_da_thread(void* argumento_funcao){
+	struct dados_thread* dados = (struct dados_thread*)argumento_funcao;
 
-    int i = 0;
-    int inicio_vetor = (dados->tamanho_vetor / prc) * dados->numero_da_thread;
-    int final_vetor = (dados->tamanho_vetor / prc) * (dados->numero_da_thread + 1);
+	int i = 0;
+  int inicio_vetor = (dados->tamanho_vetor / prc) * dados->numero_da_thread;
+  int final_vetor = (dados->tamanho_vetor / prc) * (dados->numero_da_thread + 1);
 
-    int maior = -1;
+  int maior = -1;
 
-    for (i = inicio_vetor; i < final_vetor; i++) {
-        if (maior < dados->vetor[i]) {
-            maior = dados->vetor[i];
-        }
-    }
+  for (i = inicio_vetor; i < final_vetor; i++) {
+      if (maior < dados->vetor[i]) {
+          maior = dados->vetor[i];
+      }
+  }
 
-    sem_wait(&trava);
+  sem_wait(&trava);
 
-    if (maior_global < maior) {
-        usleep(rand() % 500);
-        maior_global = maior;
-    }
-    sem_post(&trava);
+  if (maior_global < maior) {
+      usleep(rand() % 500);
+      maior_global = maior;
+  }
+  sem_post(&trava);
+
+	int j = 0;
+	int auxiliar = dados->vetor[0];
+	for(j = 1; j < dados->tamanho_vetor; j++){
+		if(dados->vetor[j] < auxiliar){
+			auxiliar = dados->vetor[j];
+		}
+	}
+	menor_global = auxiliar;
 }
 
 int main(void)
@@ -69,7 +77,7 @@ int main(void)
 
     system("clear");
 
-	processadores:
+    processadores:
     printf("QUANTIDADE DE PROCESSOS? ");
     scanf("%i", &prc);
 
@@ -102,6 +110,7 @@ int main(void)
                         pthread_join(vetor_threads[i], NULL);
                     }
                     printf("MAIOR VALOR DO VETOR: %d\n", maior_global);
+										printf("MENOR VALOR DO VETOR: %d\n", menor_global);
                 }
             }
         }
